@@ -1,0 +1,44 @@
+version: 2
+
+sources:
+  - name: raw
+    database:  "{{ var('input_database') }}"
+    schema:  "{{ var('input_schema') }}"
+    tables:
+      - name: allergyintolerance
+      - name: careplan
+      - name: careplan_activity
+      - name: careplan_contained
+      - name: condition
+      - name: condition_code_coding
+      - name: coverage
+      - name: deviceusestatement
+      - name: deviceusestatement_contained
+      - name: deviceusestatement_extension
+      - name: diagnosticreport
+      - name: diagnosticreport_result
+      - name: diagnosticreport_extension
+      - name: documentreference
+      - name: encounter
+      - name: encounter_contained
+      - name: encounter_test
+      - name: familymemberhistory
+      - name: familymemberhistory_condition
+      - name: immunization
+      - name: immunization_contained
+      - name: medicationstatement
+      - name: medicationstatement_contained
+      - name: medicationstatement_medicationcodeableconcept_coding
+      - name: missing_paths
+      - name: observation
+      - name: observation_contained
+      - name: observation_extension
+      - name: observation_hasmember
+      - name: organization
+      - name: patient
+      - name: patient_address
+      - name: patient_old
+      - name: procedure
+      - name: procedure_contained
+      - name: procedure_reasoncode
+
