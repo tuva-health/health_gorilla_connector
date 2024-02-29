@@ -1,0 +1,35 @@
+
+-- SELECT statement for DiagnosticReport
+SELECT 
+    resourcetype,
+    id,
+    meta_versionid,
+    meta_lastupdated,
+    meta_tag_0_system,
+    meta_tag_0_code,
+    meta_tag_0_display,
+    text_status,
+    text_div,
+    identifier_0_system,
+    identifier_0_value,
+    identifier_1_type_coding_0_system,
+    identifier_1_type_coding_0_code,
+    identifier_1_type_coding_0_display,
+    identifier_1_type_text,
+    identifier_1_value,
+    identifier_1_assigner_reference,
+    status,
+    category_0_coding_0_system,
+    category_0_coding_0_code,
+    category_0_coding_0_display,
+    category_0_text,
+    code_text,
+    subject_reference,
+    subject_display,
+    performer_0_reference,
+    performer_0_display,
+    extension,
+    filename,
+    processed_date 
+FROM {{source('raw', 'diagnosticreport') }} x
+QUALIFY rank() over(partition by filename order by processed_date desc) = 1
