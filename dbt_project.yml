@@ -3,7 +3,7 @@ version: '1.0.0'
 config-version: 2
 
 
-profile: 'default_bigquery'
+profile: 'default'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]

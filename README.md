@@ -19,7 +19,7 @@ The Health Gorilla Connector is a dbt project that maps flattened Health Gorilla
 ## ✅  Quickstart Guide
 
 ### Step 1: Pre-requisites
-You must have Health Gorilla data in FHIR format that has been flattened and loaded to your warehouse. You must have dbt installed and a profile set up, or you must have a connection to your warehouse set up in dbt cloud. 
+You must have Health Gorilla data in FHIR format that has been flattened and loaded to your warehouse.  See the [FHIR_inferno](https://github.com/tuva-health/FHIR_inferno) repo including the [Health Gorilla configurations](https://github.com/tuva-health/FHIR_inferno/tree/main/configurations/configuration_Health_Gorilla), and the [FHIR preprocessing guide](https://thetuvaproject.com/guides/fhir-preprocessing). You must have dbt installed and a profile set up, or you must have a connection to your warehouse set up in dbt cloud. 
 <br/><br/> 
 
 ### Step 2: Configure Input Database and Schema
