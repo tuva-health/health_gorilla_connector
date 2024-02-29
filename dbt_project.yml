@@ -3,7 +3,7 @@ version: '1.0.0'
 config-version: 2
 
 
-profile: 'default_bigquery'
+profile: 'default'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -18,7 +18,7 @@ clean-targets:
   - "dbt_packages"
 
 vars:
-  input_database: dev-ci-testing
+  input_database: health_gorilla
   input_schema: raw_data
   clinical_enabled: true
   readmissions_enabled: true
