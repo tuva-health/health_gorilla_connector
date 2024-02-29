@@ -2,7 +2,7 @@
 -- SELECT statement for MedicationStatement_MedicationCodeableConcept_coding
 SELECT 
     medicationstatement_id,
-    "SYSTEM",
+    {{ protected_columns('SYSTEM') }},
     code,
     display,
     filename,

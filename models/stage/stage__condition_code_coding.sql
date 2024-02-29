@@ -2,7 +2,7 @@
 -- SELECT statement for Condition_code_coding
 SELECT 
     condition_id,
-    "SYSTEM",
+    {{ protected_columns('SYSTEM') }},
     code,
     display,
     filename,

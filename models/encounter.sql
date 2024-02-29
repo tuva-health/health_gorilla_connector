@@ -26,7 +26,7 @@ select
     , coalesce(etm.tuva_type,'other') as encounter_type
     , {{ try_to_cast_date('enc.period_start', 'YYYY-MM-DD') }} as encounter_start_date
     , {{ try_to_cast_date('enc.period_end', 'YYYY-MM-DD') }} as encounter_end_date
-    , datediff(day,{{ try_to_cast_date('enc.period_start', 'YYYY-MM-DD') }},{{ try_to_cast_date('enc.period_end', 'YYYY-MM-DD') }}) as length_of_stay
+    , {{ dbt.datediff(try_to_cast_date('enc.period_start', 'YYYY-MM-DD'),try_to_cast_date('enc.period_end', 'YYYY-MM-DD'),'day') }} as length_of_stay
     , null as admit_source_code
     , null as admit_source_description
     , null as admit_type_code

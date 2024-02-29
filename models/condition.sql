@@ -2,19 +2,19 @@ with coding as (
     select
           ccc.condition_id
         , ccc.code as code
-        , case when ccc."SYSTEM"  in (
+        , case when ccc.{{ protected_columns('SYSTEM') }}  in (
             'http://hl7.org/fhir/sid/icd-10-cm'
             ,'http://hl7.org/fhir/sid/icd-10'
             ,'urn:oid:2.16.840.1.113883.3.623.1' -- this is weird, oid is for "us oncology", maintained by mckesson, but all codes are icd10cm
             ) then 'icd-10-cm'
-        when ccc."SYSTEM" = 'http://hl7.org/fhir/sid/icd-9'
+        when ccc.{{ protected_columns('SYSTEM') }} = 'http://hl7.org/fhir/sid/icd-9'
             then 'icd-9-cm'
-        when ccc."SYSTEM" = 'http://snomed.info/sct'
+        when ccc.{{ protected_columns('SYSTEM') }} = 'http://snomed.info/sct'
             then 'snomed-ct'
-        when ccc."SYSTEM" = 'http://loinc.org'
+        when ccc.{{ protected_columns('SYSTEM') }} = 'http://loinc.org'
             then 'loinc'
-        else ccc."SYSTEM"
-        end as "SYSTEM"
+        else ccc.{{ protected_columns('SYSTEM') }}
+        end as {{ protected_columns('SYSTEM') }}
         , ccc.display as display
     from {{ref('stage__condition_code_coding')}} ccc
 
@@ -26,11 +26,11 @@ with coding as (
     select
           cc.condition_id
         , cc.code
-        , cc."SYSTEM"
+        , cc.{{ protected_columns('SYSTEM') }}
         , cc.display
     from coding cc
     qualify row_number() over(partition by condition_id order by
-        case "SYSTEM"
+        case {{ protected_columns('SYSTEM') }}
             when 'icd-10-cm' then 0
             when 'snomed-ct' then 1
             when 'icd-9-cm' then 2
@@ -57,7 +57,7 @@ select
         when CATEGORY_0_CODING_0_CODE = '64572001'
             then 'disease'
         end as {{ dbt.type_string() }} ) as condition_type
-    , cast(cc."SYSTEM" as {{ dbt.type_string() }} ) as source_code_type
+    , cast(cc.{{ protected_columns('SYSTEM') }} as {{ dbt.type_string() }} ) as source_code_type
     , cast(cc.code as {{ dbt.type_string() }} ) as source_code
     , cast(cc.display as {{ dbt.type_string() }} ) as source_description
     , cast(case
@@ -79,11 +79,11 @@ left join {{ref('stage__patient')}} p
 left join condition_code cc
     on c.id = cc.condition_id
 left join {{ref('terminology__icd_10_cm')}} icd10
-    on cc."SYSTEM"  = 'icd-10-cm' and replace(cc.code,'.','') = icd10.icd_10_cm
+    on cc.{{ protected_columns('SYSTEM') }}  = 'icd-10-cm' and replace(cc.code,'.','') = icd10.icd_10_cm
 left join {{ref('terminology__icd_9_cm')}} icd9
-    on cc."SYSTEM"  = 'icd-9-cm' and cc.code = icd9.icd_9_cm
+    on cc.{{ protected_columns('SYSTEM') }}  = 'icd-9-cm' and cc.code = icd9.icd_9_cm
 left join {{ref('terminology__loinc')}} loinc
-    on cc."SYSTEM" = 'loinc' and cc.code = loinc.loinc
+    on cc.{{ protected_columns('SYSTEM') }} = 'loinc' and cc.code = loinc.loinc
 -- left join { { source('term','snomed') } } snomed
---     on cc."SYSTEM" = 'snomed-ct' and cc.code = snomed.conceptid
+--     on cc.{{ protected_columns('SYSTEM') }} = 'snomed-ct' and cc.code = snomed.conceptid
 

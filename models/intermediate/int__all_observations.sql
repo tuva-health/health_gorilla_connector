@@ -1,5 +1,5 @@
 with coding_system_raw as (
-    select cast(obvs.id  as varchar ) || coalesce(cast( '__' || obvscon.id as varchar),'') as id
+    select cast(obvs.id  as {{ dbt.type_string() }} ) || coalesce(cast( '__' || obvscon.id as {{ dbt.type_string() }}),'') as id
          ,0 as table_priority
          ,0 as array_priority
          ,obvscon.CODE_CODING_0_SYSTEM as code_type_raw
@@ -14,7 +14,7 @@ with coding_system_raw as (
 
     union all
 
-    select cast(obvs.id  as varchar ) || coalesce(cast( '__' || obvscon.id as varchar),'')
+    select cast(obvs.id  as {{ dbt.type_string() }} ) || coalesce(cast( '__' || obvscon.id as {{ dbt.type_string() }}),'')
          ,0 as table_priority
          ,1 as array_priority
          ,obvscon.CODE_CODING_1_SYSTEM as code_type_raw
@@ -29,7 +29,7 @@ with coding_system_raw as (
 
     union all
 
-    select cast(obvs.id  as varchar ) ||  coalesce(cast( '__' || obvscon.id as varchar),'')
+    select cast(obvs.id  as {{ dbt.type_string() }} ) ||  coalesce(cast( '__' || obvscon.id as {{ dbt.type_string() }}),'')
          ,1 as table_priority
          ,0 as array_priority
          ,obvs.CODE_CODING_0_SYSTEM as code_type_raw
@@ -73,19 +73,19 @@ with coding_system_raw as (
     qualify row_number() over(partition by id order by table_priority,code_type_priority,array_priority) = 1
 )
 select
-      cast(obvs.id  as varchar ) || coalesce(cast( '__' || obvscon.id as varchar),'') as id
-    , cast(pat.identifier_1_value as varchar ) as patient_id
+      cast(obvs.id  as {{ dbt.type_string() }} ) || coalesce(cast( '__' || obvscon.id as {{ dbt.type_string() }}),'') as id
+    , cast(pat.identifier_1_value as {{ dbt.type_string() }} ) as patient_id
     , coding_system.code_type
     , coding_system.code
     , coding_system.description
-    , cast(obvs.status as varchar ) as status
-    , cast(coalesce(obvscon.valuequantity_value, obvs.valuequantity_value, obvs.valuestring) as varchar ) as result
+    , cast(obvs.status as {{ dbt.type_string() }} ) as status
+    , cast(coalesce(obvscon.valuequantity_value, obvs.valuequantity_value, obvs.valuestring) as {{ dbt.type_string() }} ) as result
     , cast(obvs.effectivedatetime as date) as result_date
     , cast(obvscon.collection_collecteddatetime as date) as collection_date
-    , cast(coalesce(obvscon.valuequantity_unit,  obvs.valuequantity_unit) as varchar ) as source_units
-    , cast(obvs.referencerange_0_low_value as varchar ) as source_reference_range_low
-    , cast(obvs.referencerange_0_high_value as varchar ) as source_reference_range_high
-    , cast(obvs.interpretation_0_coding_0_display as varchar) as source_abnormal_flag
+    , cast(coalesce(obvscon.valuequantity_unit,  obvs.valuequantity_unit) as {{ dbt.type_string() }} ) as source_units
+    , cast(obvs.referencerange_0_low_value as {{ dbt.type_string() }} ) as source_reference_range_low
+    , cast(obvs.referencerange_0_high_value as {{ dbt.type_string() }} ) as source_reference_range_high
+    , cast(obvs.interpretation_0_coding_0_display as {{ dbt.type_string() }}) as source_abnormal_flag
     , coalesce(obvscon.category_0_coding_0_code,obvs.category_0_coding_0_code) as category
     , loinc.loinc as loinc_code
     , loinc.long_common_name as loinc_description
@@ -98,7 +98,7 @@ left join {{ref('stage__patient')}} pat
 left join {{ref('stage__observation_contained')}} obvscon
     on obvs.id = obvscon.observation_id and obvscon.RESOURCETYPE = 'Observation'
 left join coding_system
-    on cast(obvs.id  as varchar ) || '__' || coalesce(cast(obvscon.id as varchar),'') = coding_system.id
+    on cast(obvs.id  as {{ dbt.type_string() }} ) || '__' || coalesce(cast(obvscon.id as {{ dbt.type_string() }}),'') = coding_system.id
 left join {{ref('terminology__loinc')}} loinc
     on coding_system.code_type = 'loinc' and coding_system.code = loinc.loinc
 -- left join { { source('term','snomed') } } snomed
