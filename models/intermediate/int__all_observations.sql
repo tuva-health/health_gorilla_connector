@@ -96,7 +96,7 @@ left join {{ref('stage__patient')}} pat
 left join {{ref('stage__observation_contained')}} obvscon
     on obvs.id = obvscon.observation_id and obvscon.RESOURCETYPE = 'Observation'
 left join coding_system
-    on cast(obvs.id  as varchar ) || coalesce(cast( '__' || obvscon.id as varchar),'') = coding_system.id
+    on cast(obvs.id  as {{ dbt.type_string() }} ) || coalesce(cast( '__' || obvscon.id as {{ dbt.type_string() }}),'') = coding_system.id
 left join {{ref('terminology__loinc')}} loinc
     on coding_system.code_type = 'loinc' and coding_system.code = loinc.loinc
 -- left join { { source('term','snomed') } } snomed
