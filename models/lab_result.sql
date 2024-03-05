@@ -32,4 +32,6 @@ select
     , cast(null as {{ dbt.type_string() }} ) as ordering_practitioner_id
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
 from {{ref('int__all_observations')}} ao
+where category = 'laboratory'
+
 
