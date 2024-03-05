@@ -8,9 +8,8 @@ with coding_system_raw as (
     from {{ref('stage__observation')}} obvs
     left join {{ref('stage__observation_contained')}}  obvscon
         on obvs.id = obvscon.observation_id and obvscon.RESOURCETYPE = 'Observation'
-    where obvscon.CODE_CODING_0_SYSTEM is not null
-        and obvscon.CODE_CODING_0_CODE is not null
-        and obvscon.CODE_CODING_0_DISPLAY is not null
+    where  obvscon.CODE_CODING_0_CODE is not null
+        or obvscon.CODE_CODING_0_DISPLAY is not null
 
     union all
 
@@ -23,9 +22,8 @@ with coding_system_raw as (
     from {{ref('stage__observation')}} obvs
     left join {{ref('stage__observation_contained')}}  obvscon
         on obvs.id = obvscon.observation_id and obvscon.RESOURCETYPE = 'Observation'
-    where obvscon.CODE_CODING_1_SYSTEM is not null
-        and obvscon.CODE_CODING_1_CODE is not null
-        and obvscon.CODE_CODING_1_DISPLAY is not null
+    where  obvscon.CODE_CODING_1_CODE is not null
+        or obvscon.CODE_CODING_1_DISPLAY is not null
 
     union all
 
@@ -34,13 +32,13 @@ with coding_system_raw as (
          ,0 as array_priority
          ,obvs.CODE_CODING_0_SYSTEM as code_type_raw
          ,obvs.CODE_CODING_0_CODE as code
-         ,obvs.CODE_CODING_0_DISPLAY as description
+         ,coalesce(obvs.CODE_CODING_0_DISPLAY,obvs.code_text) as description
     from {{ref('stage__observation')}} obvs
     left join {{ref('stage__observation_contained')}}  obvscon
         on obvs.id = obvscon.observation_id and obvscon.RESOURCETYPE = 'Observation'
-    where obvs.CODE_CODING_0_SYSTEM is not null
-        and obvs.CODE_CODING_0_CODE is not null
-        and obvs.CODE_CODING_0_DISPLAY is not null
+    where obvs.CODE_CODING_0_CODE is not null
+        or obvs.CODE_CODING_0_DISPLAY is not null
+        or obvs.code_text is not null
 )
 ,coding_system as (
     select id,
@@ -98,9 +96,9 @@ left join {{ref('stage__patient')}} pat
 left join {{ref('stage__observation_contained')}} obvscon
     on obvs.id = obvscon.observation_id and obvscon.RESOURCETYPE = 'Observation'
 left join coding_system
-    on cast(obvs.id  as {{ dbt.type_string() }} ) || '__' || coalesce(cast(obvscon.id as {{ dbt.type_string() }}),'') = coding_system.id
+    on cast(obvs.id  as varchar ) || coalesce(cast( '__' || obvscon.id as varchar),'') = coding_system.id
 left join {{ref('terminology__loinc')}} loinc
     on coding_system.code_type = 'loinc' and coding_system.code = loinc.loinc
 -- left join { { source('term','snomed') } } snomed
 --     on coding_system.code_type = 'snomed' and coding_system.code = snomed.conceptid
-
+where not (obvs.code_text = 'n/a' and obvs.code_coding_0_system is null)
