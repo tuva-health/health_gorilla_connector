@@ -37,11 +37,15 @@ select
 , cast(null as {{ dbt.type_string() }} ) as modifier_3
 , cast(null as {{ dbt.type_string() }} ) as modifier_4
 , cast(null as {{ dbt.type_string() }} ) as modifier_5
-, cast(null as {{ dbt.type_string() }} ) as practitioner_id
+, cast(pc.identifier_0_value as {{ dbt.type_string() }} ) as practitioner_id
 , cast('healthgorilla' as {{ dbt.type_string() }} ) as data_source
 from {{ ref('stage__procedure' ) }} pro
 left join {{ ref('stage__patient' ) }} pat
     on right(pro.subject_reference,24) = pat.id
+left join {{ ref('stage__procedure_contained')}} pc
+    on pro.id = pc.procedure_id
+    and replace(pro.PERFORMER_0_ACTOR_REFERENCE,'#','') = pc.ID
+    and pc.RESOURCETYPE = 'Practitioner'
 left join {{ref('terminology__hcpcs_level_2')}} hcpcs
     on code_coding_0_system in ('urn:oid:2.16.840.1.113883.6.285','http://www.ama-assn.org/go/cpt')
     and pro.code_coding_0_code = hcpcs.hcpcs

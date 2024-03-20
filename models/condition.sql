@@ -7,7 +7,8 @@ with coding as (
             ,'http://hl7.org/fhir/sid/icd-10'
             ,'urn:oid:2.16.840.1.113883.3.623.1' -- this is weird, oid is for "us oncology", maintained by mckesson, but all codes are icd10cm
             ) then 'icd-10-cm'
-        when ccc.{{ protected_columns('SYSTEM') }} = 'http://hl7.org/fhir/sid/icd-9'
+        when ccc.{{ protected_columns('SYSTEM') }} in( 'http://hl7.org/fhir/sid/icd-9',
+                                                        'http://hl7.org/fhir/sid/icd-9-cm')
             then 'icd-9-cm'
         when ccc.{{ protected_columns('SYSTEM') }} = 'http://snomed.info/sct'
             then 'snomed-ct'
@@ -25,7 +26,8 @@ with coding as (
 ,condition_code as (
     select
           cc.condition_id
-        , cc.code
+        , case when cc.system in ('icd-10-cm','icd-9-cm') then replace(cc.code,'.','')
+            else cc.code end as code
         , cc.{{ protected_columns('SYSTEM') }}
         , cc.display
     from coding cc
@@ -79,7 +81,7 @@ left join {{ref('stage__patient')}} p
 left join condition_code cc
     on c.id = cc.condition_id
 left join {{ref('terminology__icd_10_cm')}} icd10
-    on cc.{{ protected_columns('SYSTEM') }}  = 'icd-10-cm' and replace(cc.code,'.','') = icd10.icd_10_cm
+    on cc.{{ protected_columns('SYSTEM') }}  = 'icd-10-cm' and cc.code = icd10.icd_10_cm
 left join {{ref('terminology__icd_9_cm')}} icd9
     on cc.{{ protected_columns('SYSTEM') }}  = 'icd-9-cm' and cc.code = icd9.icd_9_cm
 left join {{ref('terminology__loinc')}} loinc
