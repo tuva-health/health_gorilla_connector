@@ -26,7 +26,7 @@ with coding as (
 ,condition_code as (
     select
           cc.condition_id
-        , case when cc.system in ('icd-10-cm','icd-9-cm') then replace(cc.code,'.','')
+        , case when cc.{{ protected_columns('SYSTEM') }} in ('icd-10-cm','icd-9-cm') then replace(cc.code,'.','')
             else cc.code end as code
         , cc.{{ protected_columns('SYSTEM') }}
         , cc.display
