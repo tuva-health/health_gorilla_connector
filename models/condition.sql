@@ -66,11 +66,11 @@ select
             when icd10.icd_10_cm is not null then 'icd-10-cm'
             when icd9.icd_9_cm is not null then 'icd-9-cm'
             when loinc.loinc is not null then 'loinc'
---             when snomed.conceptid is not null then 'snomed-ct'
+            when snomed.snomed_ct is not null then 'snomed-ct'
             end
         as {{ dbt.type_string() }} ) as normalized_code_type
     , cast(coalesce(replace(icd10.icd_10_cm,'.',''), icd9.icd_9_cm, loinc.loinc)  as {{ dbt.type_string() }} ) as normalized_code
-    , cast(coalesce(icd10.description, icd9.long_description, loinc.long_common_name) as {{ dbt.type_string() }} ) as normalized_description
+    , cast(coalesce(icd10.long_description, icd9.long_description, loinc.long_common_name, snomed_ct.description) as {{ dbt.type_string() }} ) as normalized_description
     , cast(null as {{ dbt.type_int() }} ) as condition_rank
     , cast(null as {{ dbt.type_string() }} ) as present_on_admit_code
     , cast(null as {{ dbt.type_string() }} ) as present_on_admit_description
@@ -86,6 +86,6 @@ left join {{ref('terminology__icd_9_cm')}} icd9
     on cc.{{ protected_columns('SYSTEM') }}  = 'icd-9-cm' and cc.code = icd9.icd_9_cm
 left join {{ref('terminology__loinc')}} loinc
     on cc.{{ protected_columns('SYSTEM') }} = 'loinc' and cc.code = loinc.loinc
--- left join { { source('term','snomed') } } snomed
---     on cc.{{ protected_columns('SYSTEM') }} = 'snomed-ct' and cc.code = snomed.conceptid
+left join {{ref('terminology__snomed_ct')}} snomed
+    on cc.{{ protected_columns('SYSTEM') }} = 'snomed-ct' and cc.code = snomed.snomed_ct
 

@@ -21,8 +21,6 @@ oids:
 select
       enc.id as encounter_id -- should this be the source specific id?
     , pat.identifier_1_value as patient_id
---     , case type_0_text
---         when
     , coalesce(etm.tuva_type,'other') as encounter_type
     , {{ try_to_cast_date('enc.period_start', 'YYYY-MM-DD') }} as encounter_start_date
     , {{ try_to_cast_date('enc.period_end', 'YYYY-MM-DD') }} as encounter_end_date
