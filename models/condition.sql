@@ -70,7 +70,7 @@ select
             end
         as {{ dbt.type_string() }} ) as normalized_code_type
     , cast(coalesce(replace(icd10.icd_10_cm,'.',''), icd9.icd_9_cm, loinc.loinc)  as {{ dbt.type_string() }} ) as normalized_code
-    , cast(coalesce(icd10.long_description, icd9.long_description, loinc.long_common_name, snomed_ct.description) as {{ dbt.type_string() }} ) as normalized_description
+    , cast(coalesce(icd10.long_description, icd9.long_description, loinc.long_common_name, snomed.description) as {{ dbt.type_string() }} ) as normalized_description
     , cast(null as {{ dbt.type_int() }} ) as condition_rank
     , cast(null as {{ dbt.type_string() }} ) as present_on_admit_code
     , cast(null as {{ dbt.type_string() }} ) as present_on_admit_description
