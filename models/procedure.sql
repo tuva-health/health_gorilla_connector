@@ -16,18 +16,18 @@ select
 , cast(pro.code_text as {{ dbt.type_string() }} ) as source_description
 , cast(case
         when hcpcs.hcpcs is not null then 'hcpcs'
---         when snomed.conceptid is not null then 'snomed-ct'
+        when snomed.snomed_ct is not null then 'snomed-ct'
         when loinc.loinc is not null then 'loinc'
         when pro.code_coding_0_system = 'http://www.ama-assn.org/go/cpt' then 'cpt' end
         as {{ dbt.type_string() }} ) as normalized_code_type
 , cast(coalesce(hcpcs.hcpcs,
---             snomed.conceptid,
+            snomed.snomed_ct,
             loinc.loinc,
                   case when pro.code_coding_0_system = 'http://www.ama-assn.org/go/cpt'
                     then pro.code_coding_0_code end
             ) as {{ dbt.type_string() }} ) as normalized_code
 , cast(coalesce(hcpcs.long_description,
---     snomed.term,
+    snomed.description,
     loinc.long_common_name,
                   case when pro.code_coding_0_system = 'http://www.ama-assn.org/go/cpt'
                     then pro.code_text end
@@ -49,9 +49,9 @@ left join {{ ref('stage__procedure_contained')}} pc
 left join {{ref('terminology__hcpcs_level_2')}} hcpcs
     on code_coding_0_system in ('urn:oid:2.16.840.1.113883.6.285','http://www.ama-assn.org/go/cpt')
     and pro.code_coding_0_code = hcpcs.hcpcs
--- left join { { source('term','snomed') } } snomed
---     on pro.code_coding_0_system = 'http://snomed.info/sct'
---     and pro.code_coding_0_code = snomed.conceptid
+left join {{ref('terminology__snomed_ct')}} snomed
+    on pro.code_coding_0_system = 'http://snomed.info/sct'
+    and pro.code_coding_0_code = snomed.snomed_ct
 left join {{ref('terminology__loinc')}} loinc
     on pro.code_coding_0_system = 'http://loinc.org'
     and pro.code_coding_0_code = loinc.loinc

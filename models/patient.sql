@@ -10,9 +10,11 @@ with address as (select *
       , pat.name_0_given_0                  as last_name
       , pat.gender                          as sex
       , null                                as race
-      , {{ try_to_cast_date('pat.birthdate', 'YYYY-MM-DD') }}                       as birth_date
+      , pat.birthdate                      as birth_date
       , {{ try_to_cast_date('null', 'YYYY-MM-DD') }}                                as death_date
       , null                                as death_flag
+      , null as subscriber_id
+      , null as social_security_number
       , LINE_0 || coalesce(' ' || LINE_1, '') as address
       , address.CITY                        as city
       , address.STATE                       as state

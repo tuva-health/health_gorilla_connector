@@ -46,7 +46,7 @@ with coding_system_raw as (
            array_priority,
            code_type_raw,
            case when code_type_raw = 'http://loinc.org' then 'loinc'
-                when code_type_raw = 'http://snomed.info/sct' then 'snomed'
+                when code_type_raw = 'http://snomed.info/sct' then 'snomed_ct'
                 when code_type_raw = 'http://www.ama-assn.org/go/cpt' then 'hcpcs level 1'
                 when code_type_raw like 'urn:oid:2.16.840.1.113883.3.623%' then 'usoncology'
                 when code_type_raw like 'urn:oid:2.16.840.1.113883.5.4%' then  'actcode'
@@ -87,8 +87,8 @@ select
     , coalesce(obvscon.category_0_coding_0_code,obvs.category_0_coding_0_code) as category
     , loinc.loinc as loinc_code
     , loinc.long_common_name as loinc_description
-    , case when coding_system.code_type = 'snomed' then coding_system.code end as snomed_code
-    ,  case when coding_system.code_type = 'snomed' then coding_system.description end as snomed_description
+    , snomed.snomed_ct as snomed_code
+    , snomed.description  as snomed_description
     , 'healthgorilla' as data_source
 from {{ref('stage__observation')}} obvs
 left join {{ref('stage__patient')}} pat
@@ -99,6 +99,6 @@ left join coding_system
     on cast(obvs.id  as {{ dbt.type_string() }} ) || coalesce(cast( '__' || obvscon.id as {{ dbt.type_string() }}),'') = coding_system.id
 left join {{ref('terminology__loinc')}} loinc
     on coding_system.code_type = 'loinc' and coding_system.code = loinc.loinc
--- left join { { source('term','snomed') } } snomed
---     on coding_system.code_type = 'snomed' and coding_system.code = snomed.conceptid
+left join {{ref('terminology__snomed_ct')}} snomed
+    on coding_system.code_type = 'snomed_ct' and coding_system.code = snomed.snomed_ct
 where not (obvs.code_text = 'n/a' and obvs.code_coding_0_system is null)
