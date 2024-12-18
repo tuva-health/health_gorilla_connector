@@ -56,4 +56,3 @@ left join {{ref('terminology__snomed_ct')}} snomed
 left join {{ref('terminology__loinc')}} loinc
     on pro.code_coding_0_system = 'http://loinc.org'
     and pro.code_coding_0_code = loinc.loinc
-

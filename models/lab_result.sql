@@ -1,4 +1,3 @@
-
 select
       cast(id as {{ dbt.type_string() }}) as lab_result_id
     , cast(patient_id as {{ dbt.type_string() }} ) as person_id
@@ -26,7 +25,6 @@ select
     , cast(source_reference_range_high as {{ dbt.type_string() }} ) as source_reference_range_high
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_low
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_high
---     , cast(source_abnormal_flag as {{ dbt.type_string() }} ) as source_abnormal_flag
     , cast(null as {{ dbt.type_string() }} ) as source_abnormal_flag
     , cast(null as {{ dbt.type_string() }} ) as normalized_abnormal_flag
     , cast(null as {{ dbt.type_string() }} ) as specimen
@@ -34,5 +32,3 @@ select
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
 from {{ref('int__all_observations')}} ao
 where category = 'laboratory'
-
-

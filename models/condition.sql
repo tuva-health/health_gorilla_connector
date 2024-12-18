@@ -3,9 +3,9 @@ with coding as (
           ccc.condition_id
         , ccc.code as code
         , case when ccc.{{ protected_columns('SYSTEM') }}  in (
-            'http://hl7.org/fhir/sid/icd-10-cm'
+             'http://hl7.org/fhir/sid/icd-10-cm'
             ,'http://hl7.org/fhir/sid/icd-10'
-            ,'urn:oid:2.16.840.1.113883.3.623.1' -- this is weird, oid is for "us oncology", maintained by mckesson, but all codes are icd10cm
+            ,'urn:oid:2.16.840.1.113883.3.623.1' --oid is for "us oncology", maintained by mckesson, but all codes are icd10cm
             ) then 'icd-10-cm'
         when ccc.{{ protected_columns('SYSTEM') }} in( 'http://hl7.org/fhir/sid/icd-9',
                                                         'http://hl7.org/fhir/sid/icd-9-cm')
@@ -21,9 +21,7 @@ with coding as (
 
 )
 
-
-
-,condition_code as (
+, condition_code as (
     select
           cc.condition_id
         , case when cc.{{ protected_columns('SYSTEM') }} in ('icd-10-cm','icd-9-cm') then replace(cc.code,'.','')
@@ -89,4 +87,3 @@ left join {{ref('terminology__loinc')}} loinc
     on cc.{{ protected_columns('SYSTEM') }} = 'loinc' and cc.code = loinc.loinc
 left join {{ref('terminology__snomed_ct')}} snomed
     on cc.{{ protected_columns('SYSTEM') }} = 'snomed-ct' and cc.code = snomed.snomed_ct
-

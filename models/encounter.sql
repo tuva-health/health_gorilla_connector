@@ -1,25 +1,11 @@
-/*
-oids:
- urn:oid:1.2.840.114350 is the epic oid Epic aasigns[sic] OIDs under this node 1.2.840.114350 for each customer production deployment.
- 2.16.840.1.113883.5.4 = Act code (action code), type of action represented
- urn:oid:2.16.840.1.113883.4.391 = ecw prefix
- urn:oid:2.16.840.1.113883.12.4 = patient class
- 2.16.840.1.113883.3.42 = dod (MHS)
-
- */
---
--- select * from encounter_contained
--- where RESOURCETYPE = 'Location'
---
--- select * From ENCOUNTER
- with contained as (
+with contained as (
      select *
      from {{ ref('stage__encounter_contained') }} x
      qualify row_number() over(partition by encounter_id order by id) = 1
- )
+)
 
 select
-      enc.id as encounter_id -- should this be the source specific id?
+      enc.id as encounter_id
     , pat.identifier_1_value as person_id
     , pat.identifier_1_value as patient_id
     , coalesce(etm.tuva_type,'other') as encounter_type
@@ -33,8 +19,10 @@ select
     , null as discharge_disposition_code
     , null as discharge_disposition_description
     , con.name_0_text as attending_provider_id
-    , null as facility_npi
-    , null as primary_diagnosis_code_type -- we have a diagnosis reference, but not sure yet what its pointing to
+    , null as attending_provider_name
+    , null as facility_id
+    , null as facility_name
+    , null as primary_diagnosis_code_type
     , null as primary_diagnosis_code
     , null as primary_diagnosis_description
     , null as ms_drg_code
@@ -44,7 +32,7 @@ select
     , null as paid_amount
     , null as allowed_amount
     , null as charge_amount
-     , 'healthgorilla' as data_source
+    , 'healthgorilla' as data_source
 from {{ ref('stage__encounter') }} as enc
 left join {{ ref('stage__patient' ) }} as pat
     on right(enc.subject_reference,24) = pat.id
