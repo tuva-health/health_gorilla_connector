@@ -1,5 +1,6 @@
 select
  cast(pro.id as {{ dbt.type_string() }} ) as procedure_id
+, cast(pat.identifier_1_value as {{ dbt.type_string() }} ) as person_id
 , cast(pat.identifier_1_value as {{ dbt.type_string() }} ) as patient_id
 , cast(null as {{ dbt.type_string() }} ) as encounter_id
 , cast(null as {{ dbt.type_string() }} ) as claim_id

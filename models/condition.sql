@@ -44,6 +44,7 @@ with coding as (
 
 select
       cast(c.id as {{ dbt.type_string() }} ) as condition_id
+    , cast(p.IDENTIFIER_1_VALUE as {{ dbt.type_string() }} ) as person_id
     , cast(p.IDENTIFIER_1_VALUE as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as claim_id

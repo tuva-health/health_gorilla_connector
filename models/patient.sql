@@ -5,7 +5,8 @@ with address as (select *
 
 --  select * From cte where IDENTIFIER_1_SYSTEM <> 'https://app.elationemr.com' or IDENTIFIER_1_SYSTEM is null
 
- select IDENTIFIER_1_VALUE                  as patient_id
+ select IDENTIFIER_1_VALUE                  as person_id
+      , IDENTIFIER_1_VALUE                  as patient_id
       , pat.name_0_family                   as first_name
       , pat.name_0_given_0                  as last_name
       , pat.gender                          as sex
